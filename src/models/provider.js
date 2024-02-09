@@ -4,7 +4,7 @@ const { Model, DataTypes } = require('sequelize')
 module.exports = function(sequelize) {
     class Provider extends Model {
         static associate(models){
-            Provider.hasMany(models.Product, {foreignKey: 'providerId', as: 'products'}) 
+            Provider.belongsToMany(models.Product, {through: 'ProductProvider', foreignKey: 'providerId', as: 'products'}) 
         }
     }
     Provider.init({

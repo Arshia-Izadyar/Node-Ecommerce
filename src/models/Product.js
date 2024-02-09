@@ -8,8 +8,8 @@ module.exports = function(sequelize) {
     class Product extends Model {
         static associate(models){
             Product.belongsTo(models.ProductCategory, {foreignKey: 'categoryId', as: 'category'})
-            Product.belongsTo(models.Provider, {foreignKey: 'providerId', as: 'provider'})
             Product.hasMany(models.Review, {foreignKey: 'productId', as: 'reviews'})
+            Product.belongsToMany(models.Provider, {through: 'ProductProvider', foreignKey: 'productId', as: 'providers'})
         }
     }
     Product.init({
@@ -59,14 +59,6 @@ module.exports = function(sequelize) {
             allowNull: false,
             references:{
                 model: 'ProductCategory',
-                key: 'id'
-            }
-        },
-        providerId: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references:{
-                model: 'Provider',
                 key: 'id'
             }
         }
