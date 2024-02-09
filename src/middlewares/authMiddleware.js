@@ -34,4 +34,18 @@ async function authenticate(req, res, next){
 }
 
 
-module.exports = authenticate
+function authorization(...roles) {
+    return (req, res, next) => {
+        let {role} = req.user
+        if (!roles.includes(role)){
+            return res.status(StatusCodes.FORBIDDEN).json(genResponse(null, 'you dont have permission to access this route', false, null))
+        }
+        return next()
+    }
+
+}
+
+
+
+
+module.exports = {authenticate, authorization}
