@@ -10,6 +10,7 @@ module.exports = function(sequelize) {
             Product.belongsTo(models.ProductCategory, {foreignKey: 'categoryId', as: 'category'})
             Product.hasMany(models.Review, {foreignKey: 'productId', as: 'reviews'})
             Product.belongsToMany(models.Provider, {through: 'ProductProvider', foreignKey: 'productId', as: 'providers'})
+            Product.hasMany(models.CartLines, {foreignKey: 'productId', as: 'cartLines'})
         }
     }
     Product.init({

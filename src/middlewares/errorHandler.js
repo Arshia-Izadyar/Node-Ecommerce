@@ -7,9 +7,9 @@ const { UniqueConstraintError, ValidationError, ForeignKeyConstraintError, Model
 async function errorHandler(err, req, res, next) {
     
     
-    
+    console.log(err);
     if (err instanceof ForeignKeyConstraintError) {
-        return res.status(StatusCodes.BAD_REQUEST).json(response(null, "Invalid foreign key", false, null))
+        return res.status(StatusCodes.BAD_REQUEST).json(response(null, err.message, false, null))
     }else if (err instanceof UniqueConstraintError){
         return res.status(StatusCodes.CONFLICT).json(response(null, err.errors[0].message, false, null))
 

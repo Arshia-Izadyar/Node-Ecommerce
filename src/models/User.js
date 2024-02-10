@@ -12,7 +12,7 @@ module.exports = function(sequelize){
     class User extends Model {
         static associate(models){
             User.hasMany(models.Review, {foreignKey: 'userId', as: 'reviews'})
-
+            User.hasOne(models.Cart, {foreignKey: 'userId', as: 'cart'})
         }
     }
     User.init({
@@ -73,6 +73,10 @@ module.exports = function(sequelize){
         is_verified: {
             type: DataTypes.BOOLEAN,
             defaultValue: false
+        },
+        address: {
+            type: DataTypes.TEXT,
+            allowNull: true
         }
 
 
