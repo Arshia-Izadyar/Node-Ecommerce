@@ -30,4 +30,4 @@ async function sendOtp(phone_number) {
 }   
 
 
-module.exports = sendOtp
+module.exports = {sendOtp, generateOtpCode}

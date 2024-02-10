@@ -23,7 +23,7 @@ async function getBasket(req) {
 
 
     if (user) {
-        shoppingCart = await Cart.findOne({where: {userId: user.id}, include: [{
+        shoppingCart = await Cart.findOne({where: {userId: user.id, inPayment: false}, include: [{
             model: CartLines,
             as: 'cartLines',
             attributes: ['id','productId','quantity'],
@@ -37,8 +37,8 @@ async function getBasket(req) {
         
         if (shoppingCart && cart) {
             if (shoppingCart.uuid !== cart) {
-                let cookieShoppingCart = await Model.findOne({
-                    where: { uuid: cart },
+                let cookieShoppingCart = await Cart.findOne({
+                    where: { uuid: cart, inPayment: false },
                     include: [{
                         model: CartLines,
                         as: 'cartLines',
@@ -63,7 +63,7 @@ async function getBasket(req) {
             shoppingCart = await Cart.create({userId: user.id})
         }
     } else if (cart) {
-        shoppingCart = await Cart.findOne({where: {uuid: cart}, include:[{model: CartLines, as: 'cartLines'}]})
+        shoppingCart = await Cart.findOne({where: {uuid: cart, inPayment: false}, include:[{model: CartLines, as: 'cartLines'}]})
     }
     
     if (!shoppingCart) {
@@ -75,9 +75,12 @@ async function getBasket(req) {
 async function getCart(req, res) {
     let shoppingCart = await getBasket(req)
     let total = 0
-    for (let i = 0; shoppingCart.cartLines.length > i; i++){
-        console.log(shoppingCart.cartLines[i].product);
-        total += shoppingCart.cartLines[i].product.price * shoppingCart.cartLines[i].quantity 
+    if (shoppingCart.cartLines){
+
+        for (let i = 0; shoppingCart.cartLines.length > i; i++){
+            console.log(shoppingCart.cartLines[i].product);
+            total += shoppingCart.cartLines[i].product.price * shoppingCart.cartLines[i].quantity 
+        }
     }
 
     res.cookie('cart', shoppingCart.uuid, { signed: true, maxAge: 72 * 60 * 60 * 1000 }); // 3 days in ms
@@ -88,7 +91,6 @@ async function getCart(req, res) {
 async function addToCart(req, res) {
 
     const { productId, quantity } = req.body
-
     let requestedProduct = await Product.findOne({where: {id: productId}})
 
     if (quantity > requestedProduct.quantity) {
@@ -108,9 +110,8 @@ async function addToCart(req, res) {
                 return res.status(StatusCodes.OK).json(genResponse(shoppingCart, null, true, null))    
             }
         }
-    } else {
-        await CartLines.create({cartId: shoppingCart.id, productId: productId, quantity: quantity})
-    }
+    } 
+    await CartLines.create({cartId: shoppingCart.id, productId: productId, quantity: quantity})
     return res.status(StatusCodes.OK).json(genResponse(shoppingCart, null, true, null))    
 }
 async function removeFromCart(req, res) {
@@ -140,4 +141,4 @@ async function removeFromCart(req, res) {
 
 
 
-module.exports = {addToCart, getCart, removeFromCart}
+module.exports = {addToCart, getCart, removeFromCart, getBasket}

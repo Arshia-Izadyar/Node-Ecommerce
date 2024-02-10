@@ -15,7 +15,7 @@ async function createProvider(req, res) {
 
 async function getProvider(req, res) {
     let {slug: providerSlug} = req.params
-    const provider = await Provider.findOne({where: {slug: providerSlug}})
+    const provider = await Provider.findOne({where: {slug: providerSlug}, include:['products']})
     if (!provider) {
         throw new NotFoundError(`provider with id (${providerSlug}) not found.`)
         // return res.send(StatusCodes.NOT_FOUND).json(response(null, 'provider not found', true, null))

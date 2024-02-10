@@ -13,6 +13,8 @@ module.exports = function(sequelize){
         static associate(models){
             User.hasMany(models.Review, {foreignKey: 'userId', as: 'reviews'})
             User.hasOne(models.Cart, {foreignKey: 'userId', as: 'cart'})
+            User.hasMany(models.Payment, {foreignKey: 'userId', as: 'payments'})
+            User.hasMany(models.Shipping, {foreignKey: 'userId', as: 'shippings'})
         }
     }
     User.init({

@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken')
 const {User} = require('../models/index')
 const validatePassword = require('../utils/validatePassword')
 const response = require('../utils/genResponse')
-const sendOtp = require('../utils/sendOtp')
+const {sendOtp} = require('../utils/sendOtp')
 const userPayload = require('../utils/userPayload')
 const {setValueToRedis, getValueFromRedis} = require('../utils/redis')
 
@@ -201,16 +201,16 @@ async function refresh(req, res) {
                 refreshToken: refreshToken,
             }, null, true, null))
         }
-        return res.status(StatusCodes.BAD_REQUEST).json(genResponse(null, 'provided token is expired please login again', false, null))
+        return res.status(StatusCodes.BAD_REQUEST).json(response(null, 'provided token is expired please login again', false, null))
 
 
     } catch(err) {
         if (err instanceof jwt.TokenExpiredError) {
-            return res.status(StatusCodes.BAD_REQUEST).json(genResponse(null, 'provided token is expired please login again', false, null))
+            return res.status(StatusCodes.BAD_REQUEST).json(response(null, 'provided token is expired please login again', false, null))
         }
 
         if (err instanceof jwt.JsonWebTokenError) {
-            return res.status(StatusCodes.BAD_REQUEST).json(genResponse(null, 'provided token is invalid please login again', false, null))
+            return res.status(StatusCodes.BAD_REQUEST).json(response(null, 'provided token is invalid please login again', false, null))
         }
     }
 

@@ -6,12 +6,16 @@ const express = require('express');
 const { getRedisClient } = require('./utils/redis');
 
 //router imports
-const authRouter = require('./routers/authRouter')
-const categoryRouter = require('./routers/categoryRouter')
-const productRouter = require('./routers/productRouter')
-const providerRouter = require('./routers/providerRouter')
-const reviewRouter = require('./routers/reviewRouters')
-const cartRouter = require('./routers/cartRouter')
+const {    
+    authRouter,
+    categoryRouter,
+    productRouter,
+    providerRouter,
+    reviewRouter,
+    cartRouter,
+    paymentRouter,
+    shippingRouter
+} = require('./routers/index')
 
 // middleware imports
 const morgan = require('morgan');
@@ -31,7 +35,7 @@ const genResponse = require('./utils/genResponse');
 
 const limiter = rateLimit({
 	windowMs: 15 * 60 * 1000, // 15 minutes
-	limit: 3, 
+	limit: 300, 
     message: genResponse(null, 'too many requests', false, null),
 	standardHeaders: 'draft-7',
 	legacyHeaders: false,
@@ -40,7 +44,7 @@ const limiter = rateLimit({
 
 const authLimiter = rateLimit({
     windowMs: 5 * 60 * 1000, // 5 minutes
-    limit: 10,
+    limit: 100,
     message: genResponse(null, 'too many requests', false, null),
 	standardHeaders: 'draft-7',
 	legacyHeaders: false,
@@ -65,6 +69,8 @@ app.use('/api/v1/product', [limiter, productRouter]);
 app.use('/api/v1/provider', [limiter, providerRouter]);
 app.use('/api/v1/review', [limiter, reviewRouter]);
 app.use('/api/v1/cart', cartRouter);
+app.use('/api/v1/payment', paymentRouter);
+app.use('/api/v1/shipping', shippingRouter);
 
 app.use(notFound)
 app.use(errHandler)
