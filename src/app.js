@@ -22,10 +22,33 @@ const cookieParser = require('cookie-parser')
 
 const PORT = process.env.PORT
 const app = express();
+const {rateLimit} = require("express-rate-limit");
+const genResponse = require('./utils/genResponse');
+
+
+// limiter
+
+const limiter = rateLimit({
+	windowMs: 15 * 60 * 1000, // 15 minutes
+	limit: 3, 
+    message: genResponse(null, 'too many requests', false, null),
+	standardHeaders: 'draft-7',
+	legacyHeaders: false,
+	
+})
+
+const authLimiter = rateLimit({
+    windowMs: 5 * 60 * 1000, // 5 minutes
+    limit: 10,
+    message: genResponse(null, 'too many requests', false, null),
+	standardHeaders: 'draft-7',
+	legacyHeaders: false,
+
+})
+
 
 
 // middlewares
-
 app.use(express.json())
 app.use(fileUpload())
 app.use(express.urlencoded({extended: false}))
@@ -34,12 +57,13 @@ app.use(cookieParser(process.env.COOKIE_SECRET))
 
 
 // routes
-app.use('/statics',express.static('./public'))
-app.use('/api/v1/auth', authRouter);
-app.use('/api/v1/category', categoryRouter);
-app.use('/api/v1/product', productRouter);
-app.use('/api/v1/provider', providerRouter);
-app.use('/api/v1/review', reviewRouter);
+app.use('/statics', limiter, express.static('./public'))
+app.use('/api/v1/auth', [authLimiter, authRouter]);
+app.use('/api/v1/category', [limiter, categoryRouter]);
+app.use('/api/v1/product', [limiter, productRouter]);
+app.use('/api/v1/provider', [limiter, providerRouter]);
+app.use('/api/v1/review', [limiter, reviewRouter]);
+
 app.use(notFound)
 app.use(errHandler)
 

@@ -1,6 +1,5 @@
 const { StatusCodes } = require("http-status-codes")
 const { Review } = require('../models/index')
-const { Model } = require("sequelize")
 const saveImages = require("../utils/saveImages")
 const genResponse = require("../utils/genResponse")
 const path = require('path');
