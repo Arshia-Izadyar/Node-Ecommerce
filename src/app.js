@@ -10,6 +10,7 @@ const authRouter = require('./routers/authRouter')
 const categoryRouter = require('./routers/categoryRouter')
 const productRouter = require('./routers/productRouter')
 const providerRouter = require('./routers/providerRouter')
+const reviewRouter = require('./routers/reviewRouters')
 
 // middleware imports
 const morgan = require('morgan');
@@ -38,6 +39,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/category', categoryRouter);
 app.use('/api/v1/product', productRouter);
 app.use('/api/v1/provider', providerRouter);
+app.use('/api/v1/review', reviewRouter);
 app.use(notFound)
 app.use(errHandler)
 

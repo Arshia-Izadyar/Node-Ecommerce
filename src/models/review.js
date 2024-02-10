@@ -42,7 +42,7 @@ module.exports = (sequelize) => {
             onUpdate: 'CASCADE'
         },
         image: {
-            type: DataTypes.STRING,
+            type: DataTypes.JSON,
             allowNull: true
         }
     }, {

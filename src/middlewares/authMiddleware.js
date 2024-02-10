@@ -13,12 +13,12 @@ async function authenticate(req, res, next){
     let token = authHeader.split(" ")[1]
 
     try{
-        const {userId, type, role} = jwt.verify(token, process.env.JWT_SECRET, {algorithm:'HS256'})
+        const {userId, type, role, id} = jwt.verify(token, process.env.JWT_SECRET, {algorithm:'HS256'})
         if (type !== accessTokenKey) {
             return res.status(StatusCodes.UNAUTHORIZED).json(genResponse(null, 'provided token is not a accessToken', false, null))
             
         }
-        req.user = {userId: userId, role: role}
+        req.user = {userId: userId, role: role, id: id}
         console.log(req.user);
         return next();
         

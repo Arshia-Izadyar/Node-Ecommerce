@@ -1,5 +1,5 @@
 const {StatusCodes}= require('http-status-codes')
-const { Product, ProductCategory, Provider, sequelize, Sequelize } = require('../models/index')
+const { Product, ProductCategory, Provider, sequelize, Sequelize, Review } = require('../models/index')
 const { UniqueConstraintError, ValidationError, ForeignKeyConstraintError, Model } = require('sequelize')
 const path = require('path');
 const fs = require('fs').promises;
@@ -14,7 +14,7 @@ async function createProduct(req, res) {
     let imageList = files.images
     let productImages = null;
         const product = await Product.create(req.body)
-        productImages = await saveImages(imageList);
+        productImages = await saveImages(imageList.length ? imageList : [imageList]);
         if (productImages){
             product.image = productImages
             await product.save()
@@ -28,14 +28,33 @@ async function getOneProduct(req, res) {
     const product = await Product.findOne({
         where: {slug: slug},
         attributes: [
-            'name', 'slug', 'price', 'description', 'image', 'available', 'quantity', 'off_percent'
+            'name', 'slug', 'price', 'description', 'image', 'available', 'quantity', 'off_percent',
+            [Sequelize.fn('AVG', Sequelize.col('reviews.rate')), 'rating']
         ],
         include: [{
             model: ProductCategory,
             as: 'category',
-            attributes: ['name', 'slug']
+            attributes: ['name', 'slug'],
+            require: false,
+            duplicating: false
+        },
+        {model: Provider,
+            as: 'providers',
+            attributes:["name", "slug", "description"]
+        },
+        {
+            model: Review,
+            as: 'reviews',
+            attributes: ['comment', 'rate']
         }],
-        include: [{model: Provider, as: 'providers',attributes:["name", "slug", "description"]} ]
+        group: ['Product.id', 'category.id', 'providers.id', 'reviews.id', 'providers->ProductProvider.productId', 'providers->ProductProvider.providerId']
+    // ],
+    //     include: [{model: Provider, as: 'providers',attributes:["name", "slug", "description"]} ],
+    //     include: [{
+    //         model: Review,
+    //         as: 'reviews',
+    //         attributes: ['comment']
+    //     }]
 
     })
     if (!product) {
@@ -63,9 +82,7 @@ async function addProvider(req, res) {
     const productWithProviders = await Product.findByPk(prodId, {
         include: [{model: Provider, as: 'providers',attributes:["name", "slug", "description"]} ]
     });
-
     res.status(200).json(productWithProviders);
-
 }
 
 
@@ -119,14 +136,13 @@ async function updateProduct(req, res) {
 
     let newImages = null
     if (files) {
-        newImages = await saveImages(files)
+        newImages = await saveImages(files.length ? files : [files])
     }
 
     const product = await Product.findOne({where: {slug: productSlug}})
     if (!product) {
         throw new NotFoundError(`can't find product with slug (${productSlug})`)
     }
-
     const allowedUpdates = ['name', 'price', 'description', 'off_percent', 'available', 'quantity'];
 
     const updateData = Object.keys(req.body)
@@ -139,11 +155,8 @@ async function updateProduct(req, res) {
     if (newImages) {
         updateData.image = [...product.image, ...newImages]
     }
-
     await product.update(updateData)
-
     return res.status(StatusCodes.ACCEPTED).json(response(product, null, false, null))
-
 }   
 
 
@@ -190,15 +203,11 @@ async function getAllProducts(req, res) {
         }],
         where: where,
         order: order,
-        
-
     })
-
     let next_page_url = ''
     if (products.length >= 10 ) {
         next_page_url = `http://127.0.0.1:8000/api/v1/product?price=${price? price :''}&name=${name?name:''}&q=${q? q :'' }&provider=${provider? provider : '' }&category=${category?category: ''}&page=${++page}`
     }
-
     return res.status(StatusCodes.OK).json(response(products, null, true, {next: next_page_url}))
 }
 

@@ -8,10 +8,13 @@ async function errorHandler(err, req, res, next) {
     
     
     
-    if (err instanceof UniqueConstraintError || err instanceof ValidationError) {
-        return res.status(StatusCodes.BAD_REQUEST).json(response(null, err.errors[0].message, false, null))
-    }else if (err instanceof ForeignKeyConstraintError) {
+    if (err instanceof ForeignKeyConstraintError) {
         return res.status(StatusCodes.BAD_REQUEST).json(response(null, "Invalid foreign key", false, null))
+    }else if (err instanceof UniqueConstraintError){
+        return res.status(StatusCodes.CONFLICT).json(response(null, err.errors[0].message, false, null))
+
+    }else if (err instanceof ValidationError) {
+        return res.status(StatusCodes.BAD_REQUEST).json(response(null, err.errors[0].message, false, null))
     }
     let status = err.statusCode || StatusCodes.INTERNAL_SERVER_ERROR
     let message = err.message || "something went wrong"
