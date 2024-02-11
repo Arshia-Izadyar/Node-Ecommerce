@@ -1,6 +1,6 @@
-const accessTokenKey = "accessToken";
-const refreshTokenKey = "refreshToken";
+const accessTokenKey = 'accessToken'
+const refreshTokenKey = 'refreshToken'
 module.exports = {
-  accessTokenKey,
-  refreshTokenKey,
-};
+    accessTokenKey,
+    refreshTokenKey,
+}

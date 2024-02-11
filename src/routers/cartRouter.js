@@ -1,16 +1,16 @@
-const express = require("express");
+const express = require('express')
 
 const {
-  addToCart,
-  getCart,
-  removeFromCart,
-} = require("../controllers/cartController");
-const { optionalAuthenticate } = require("../middlewares/index");
+    addToCart,
+    getCart,
+    removeFromCart,
+} = require('../controllers/cartController')
+const { optionalAuthenticate } = require('../middlewares/index')
 
-const router = express.Router();
+const router = express.Router()
 
-router.route("/").get(optionalAuthenticate, getCart);
-router.route("/add").post(optionalAuthenticate, addToCart);
-router.route("/remove").post(optionalAuthenticate, removeFromCart);
+router.route('/').get(optionalAuthenticate, getCart)
+router.route('/add').post(optionalAuthenticate, addToCart)
+router.route('/remove').post(optionalAuthenticate, removeFromCart)
 
-module.exports = router;
+module.exports = router

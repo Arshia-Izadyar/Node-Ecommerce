@@ -1,8 +1,7 @@
-version: '3.7'
+version: "3.7"
 
 services:
-
-############################### DB ###############################
+  ############################### DB ###############################
   postgres:
     image: postgres
     container_name: postgres_container
@@ -24,7 +23,7 @@ services:
     container_name: pdadmin_container
     environment:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-changeme@changeme.com}
-      PGADMIN_DEFAULT_PASSWORD:  ${PGADMIN_DEFAULT_PASSWORD:-changeme}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-changeme}
     volumes:
       - pgadmin:/var/lib/pgadmin
     ports:
@@ -34,8 +33,7 @@ services:
     restart: unless-stopped
     depends_on:
       - postgres
-  
-  
+
   redis:
     image: redis
     container_name: redis_container
