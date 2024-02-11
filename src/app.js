@@ -26,7 +26,7 @@ const cookieParser = require("cookie-parser");
 const { rateLimit } = require("express-rate-limit");
 const { errorHandler, notFound } = require("./middlewares/index");
 
-const { genResponse, getRedisClient } = require("./utils/index");
+const { genResponse, getRedisClient, responseInterceptor } = require("./utils/index");
 const PORT = process.env.PORT;
 const app = express();
 
@@ -56,6 +56,7 @@ app.use(morgan("dev"));
 app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // routes
+app.use(responseInterceptor)
 app.use("/statics", limiter, express.static("./public"));
 app.use("/api/v1/auth", [authLimiter, authRouter]);
 app.use("/api/v1/category", [limiter, categoryRouter]);

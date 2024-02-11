@@ -13,7 +13,6 @@ async function getRedisClient() {
       },
     });
     redisClient.on("error", (err) => console.log("Redis Client Error", err));
-    console.log("redis hit");
     await redisClient.connect();
   }
   return redisClient;

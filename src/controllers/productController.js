@@ -13,10 +13,10 @@ const fs = require("fs").promises;
 const {
   genResponse: response,
   saveImages: saveImages,
+  httpLogger, formatHTTPLoggerResponse
 } = require("../utils/index");
 const NotFoundError = require("../errors/notFoundError");
 
-const { httpLogger, formatHTTPLoggerResponse } = require("../utils/logger");
 
 async function createProduct(req, res) {
   const files = req.files;
@@ -76,6 +76,7 @@ async function getOneProduct(req, res) {
       "providers->ProductProvider.providerId",
     ],
   });
+  // httpLogger.info('product', formatHTTPLoggerResponse(req, res, product))
   if (!product) {
     return res
       .status(StatusCodes.NOT_FOUND)

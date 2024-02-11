@@ -8,6 +8,8 @@ const saveImages = require("./saveImages");
 const { sendOtp, generateOtpCode } = require("./sendOtp");
 const userPayload = require("./userPayload");
 const validatePassword = require("./validatePassword");
+const {httpLogger, formatHTTPLoggerResponse, responseInterceptor, sequelizeLogger} = require('./logger')
+
 
 module.exports = {
   genResponse,
@@ -19,4 +21,8 @@ module.exports = {
   generateOtpCode,
   userPayload,
   validatePassword,
+  httpLogger,
+  responseInterceptor,
+  formatHTTPLoggerResponse, 
+  sequelizeLogger
 };

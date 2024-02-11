@@ -4,6 +4,7 @@ const fs = require("fs");
 const path = require("path");
 const Sequelize = require("sequelize");
 const process = require("process");
+const { sequelizeLogger } = require("../utils/index");
 const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || "development";
 const config = require(__dirname + "/../config/config.json")[env];
@@ -17,7 +18,8 @@ if (config.use_env_variable) {
     config.database,
     config.username,
     config.password,
-    config,
+    {...config, 
+    logging: sequelizeLogger}
   );
 }
 
@@ -31,7 +33,6 @@ fs.readdirSync(__dirname)
     );
   })
   .forEach((file) => {
-    console.log("Loading model file:", file); // Add this line
     const model = require(path.join(__dirname, file))(sequelize);
     db[model.name] = model;
   });
