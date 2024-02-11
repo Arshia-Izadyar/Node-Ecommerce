@@ -1,7 +1,7 @@
 const express = require('express'); 
 const { getAllProviders, createProvider, updateProvider, deleteProvider, getProvider } = require('../controllers/providerController') 
 
-const { authenticate, authorization } = require('../middlewares/authMiddleware')
+const { authenticate, authorization } = require('../middlewares/index')
 
 
 const router = express.Router()

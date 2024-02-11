@@ -2,7 +2,7 @@ const express = require('express');
 
 const { createShipping, updateShippingStatus, deliverShipping, updateShipping, getAllShippings, getShipping } = require('../controllers/shippingController')
 
-const { authenticate, authorization } = require('../middlewares/authMiddleware')
+const { authenticate, authorization } = require('../middlewares/index')
 
 
 const router = express.Router()

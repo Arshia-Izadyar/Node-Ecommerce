@@ -3,7 +3,10 @@ require('express-async-errors');
 require('dotenv').config()
 const {sequelize} = require('./models/index');
 const express = require('express'); 
-const { getRedisClient } = require('./utils/redis');
+
+// swagger 
+const swaggerDocs = require('./utils/swagger')
+
 
 //router imports
 const {    
@@ -20,15 +23,15 @@ const {
 // middleware imports
 const morgan = require('morgan');
 const fileUpload = require('express-fileupload');  
-
-const notFound = require('./middlewares/notFound')
-const errHandler = require('./middlewares/errorHandler')
 const cookieParser = require('cookie-parser')
+const {rateLimit} = require("express-rate-limit");
+const {errorHandler, notFound} = require('./middlewares/index')
 
+
+
+const {genResponse, getRedisClient} = require('./utils/index');
 const PORT = process.env.PORT
 const app = express();
-const {rateLimit} = require("express-rate-limit");
-const genResponse = require('./utils/genResponse');
 
 
 // limiter
@@ -72,14 +75,17 @@ app.use('/api/v1/cart', cartRouter);
 app.use('/api/v1/payment', paymentRouter);
 app.use('/api/v1/shipping', shippingRouter);
 
-app.use(notFound)
-app.use(errHandler)
+// app.use(notFound)
+
+app.use(errorHandler)
 
 async function start() {
     await sequelize.sync({force: false})
     require('./models/index')
     app.listen(PORT, () => {console.log(`Node server started at port ${PORT} ...`)})
     await getRedisClient()
+    swaggerDocs(app, PORT)
+
 }
 
 

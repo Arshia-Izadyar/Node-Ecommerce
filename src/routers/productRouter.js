@@ -2,7 +2,7 @@ const express = require('express');
 const { createProduct, getOneProduct, addProvider, removeProvider, deleteProduct, updateProduct, getAllProducts } = require('../controllers/productController') 
 const { createReview, deleteReview } = require('../controllers/reviewController')
 
-const { authenticate, authorization } = require('../middlewares/authMiddleware')
+const { authenticate, authorization } = require('../middlewares/index')
 
 
 const router = express.Router()

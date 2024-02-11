@@ -1,12 +1,12 @@
 const {StatusCodes}= require('http-status-codes')
 const { Product, ProductCategory, Provider, sequelize, Sequelize, Review } = require('../models/index')
-const { UniqueConstraintError, ValidationError, ForeignKeyConstraintError, Model } = require('sequelize')
 const path = require('path');
 const fs = require('fs').promises;
 
-const response  = require('../utils/genResponse')
-const saveImages = require('../utils/saveImages')
+const {genResponse: response, saveImages: saveImages}  = require('../utils/index')
 const NotFoundError = require('../errors/notFoundError')
+
+const {httpLogger, formatHTTPLoggerResponse} = require('../utils/logger')
 
 
 async function createProduct(req, res) {
@@ -48,14 +48,6 @@ async function getOneProduct(req, res) {
             attributes: ['comment', 'rate']
         }],
         group: ['Product.id', 'category.id', 'providers.id', 'reviews.id', 'providers->ProductProvider.productId', 'providers->ProductProvider.providerId']
-    // ],
-    //     include: [{model: Provider, as: 'providers',attributes:["name", "slug", "description"]} ],
-    //     include: [{
-    //         model: Review,
-    //         as: 'reviews',
-    //         attributes: ['comment']
-    //     }]
-
     })
     if (!product) {
         return res.status(StatusCodes.NOT_FOUND).json(response(null, 'product not found', false, null))

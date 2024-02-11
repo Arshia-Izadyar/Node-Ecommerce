@@ -3,14 +3,42 @@ const { ValidationError, Model, DATE } = require('sequelize')
 const jwt = require('jsonwebtoken')
 
 const {User} = require('../models/index')
-const validatePassword = require('../utils/validatePassword')
-const response = require('../utils/genResponse')
-const {sendOtp} = require('../utils/sendOtp')
-const userPayload = require('../utils/userPayload')
-const {setValueToRedis, getValueFromRedis} = require('../utils/redis')
+const {genResponse: response, sendOtp, validatePassword, userPayload, setValueToRedis, getValueFromRedis} = require('../utils/index')
 
-
+/**
+ * @openapi
+ * /api/v1/auth/register:
+ *   post:
+ *     tags:
+ *       - User
+ *     summary: Register a user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               full_name:
+ *                 type: string
+ *               phone_number:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *               password_confirm:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ *       409:
+ *         description: Conflict
+ *       400:
+ *         description: Bad request
+ */
 async function register(req, res) {
+
     const {username, full_name, phone_number, password, password_confirm} = req.body
     if (password !== password_confirm) {
         return res.status(StatusCodes.BAD_REQUEST).json(response(null, 'passwords dont math', false, null))
@@ -36,6 +64,32 @@ async function register(req, res) {
     }
 }
 
+
+
+/**
+ * @openapi
+ * /api/v1/auth/request-verify:
+ *   post:
+ *     tags:
+ *       - User
+ *     summary: set otp verify to a user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               phone_number:
+ *                 type: string
+ *     responses:
+ *       201:
+ *         description: otp sent
+ *       429:
+ *         description: too many request
+ *       500:
+ *         description: something went wrong
+ */
 async function requestVerification(req, res) {
     const {phone_number} = req.body
     try {
@@ -56,6 +110,36 @@ async function requestVerification(req, res) {
     }
 }
 
+
+
+
+
+/**
+ * @openapi
+ * /api/v1/auth/verify:
+ *   post:
+ *     tags:
+ *       - User
+ *     summary: verify a user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               otp:
+ *                 type: string
+ *               phone_number:
+ *                 type: string
+ *     responses:
+ *       202:
+ *         description: verified
+ *       404:
+ *         description: user not found
+ *       400:
+ *         description: invalid otp
+ */
 async function verifyUser(req, res) {
     const {otp, phone_number} = req.body
     let otpKey = `otp_${phone_number}`
@@ -75,6 +159,33 @@ async function verifyUser(req, res) {
     return res.status(StatusCodes.BAD_REQUEST).json(response(null,'invalid otp', false, null))
 }
 
+
+/**
+ * @openapi
+ * /api/v1/auth/login:
+ *   post:
+ *     tags:
+ *       - User
+ *     summary: login a user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Success
+ *       404:
+ *         description: user not found or not active
+ *       401:
+ *         description: username or password is wrong / 
+ */
 async function login(req, res) {
     const {username, password} = req.body
     const user = await User.findOne({where: {username: username}})
@@ -133,6 +244,31 @@ async function login(req, res) {
 
 }
 
+
+
+/**
+ * @openapi
+ * /api/v1/auth/logout:
+ *   post:
+ *     tags:
+ *       - User
+ *     summary: logout a user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       204:
+ *         description: Success
+ *       404:
+ *         description: user not found or not active
+ *       401:
+ *         description: provided token is invalid / expired
+ *       403:
+ *         you dont have permission to access this route 
+ */
 async function logout(req, res) {
     let reqUser = req.user
     let localRefresh = req.signedCookies.refreshToken
@@ -161,6 +297,30 @@ async function logout(req, res) {
 
 }
 
+
+/**
+ * @openapi
+ * /api/v1/auth/refresh:
+ *   get:
+ *     tags:
+ *       - User
+ *     summary: refresh a user
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *     responses:
+ *       200:
+ *         description: Success
+ *       404:
+ *         description: user not found or not active
+ *       401:
+ *         description: provided token is invalid / expired
+ *       403:
+ *         you don't have permission to access this route 
+ */
 async function refresh(req, res) {
     let localRefresh = req.signedCookies.refreshToken
     try {

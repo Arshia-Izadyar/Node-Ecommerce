@@ -1,7 +1,7 @@
 const { StatusCodes } = require("http-status-codes")
 const { Review } = require('../models/index')
-const saveImages = require("../utils/saveImages")
-const genResponse = require("../utils/genResponse")
+
+const { saveImages, genResponse } = require("../utils/index")
 const path = require('path');
 const fs = require('fs').promises;
 

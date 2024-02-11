@@ -2,7 +2,7 @@ const { Model } = require("sequelize");
 
 const { Cart, CartLines, Product } = require('../models/index');
 const { StatusCodes } = require("http-status-codes");
-const genResponse = require("../utils/genResponse");
+const {genResponse} = require("../utils/index");
 
 /*
     -----------------
@@ -72,6 +72,18 @@ async function getBasket(req) {
     return shoppingCart
 }
 
+
+/**
+ * @openapi
+ * /api/v1/cart:
+ *   get:
+ *     tags:
+ *       - Cart
+ *     summary: get current a user
+ *     responses:
+ *       200:
+ *         description: Success
+ */
 async function getCart(req, res) {
     let shoppingCart = await getBasket(req)
     let total = 0
@@ -88,6 +100,30 @@ async function getCart(req, res) {
 }
 
 
+/**
+ * @openapi
+ * /api/v1/cart/add:
+ *   post:
+ *     tags:
+ *       - Cart
+ *     summary: add a product to cart
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productId:
+ *                 type: integer
+ *               quantity:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Success
+ *       400:
+ *         description: bad quantity error
+ */
 async function addToCart(req, res) {
 
     const { productId, quantity } = req.body
@@ -114,6 +150,31 @@ async function addToCart(req, res) {
     await CartLines.create({cartId: shoppingCart.id, productId: productId, quantity: quantity})
     return res.status(StatusCodes.OK).json(genResponse(shoppingCart, null, true, null))    
 }
+
+/**
+ * @openapi
+ * /api/v1/cart/remove:
+ *   post:
+ *     tags:
+ *       - Cart
+ *     summary: remove a product to cart
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               productId:
+ *                 type: integer
+ *               quantity:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Success
+ *       400:
+ *         description: bad quantity error
+ */
 async function removeFromCart(req, res) {
     const {quantity, productId} = req.body
     let shoppingCart = await getBasket(req)

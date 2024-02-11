@@ -1,9 +1,8 @@
 const {StatusCodes}= require('http-status-codes')
 const { Provider, Sequelize } = require('../models/index')
-const { UniqueConstraintError, ValidationError, ForeignKeyConstraintError, Model, or } = require('sequelize')
 
 
-const response  = require('../utils/genResponse')
+const {genResponse:response}  = require('../utils/index')
 const NotFoundError = require('../errors/notFoundError')
 
 

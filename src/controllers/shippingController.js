@@ -1,7 +1,6 @@
 const { StatusCodes }= require('http-status-codes')
-const { Shipping } = require('../models/index')
-const { Model } = require('sequelize')
 
+const { Shipping } = require('../models/index')
 const { getBasket } = require('./cartController')
 const { generateOtpCode, genResponse } = require('../utils/index')
 
